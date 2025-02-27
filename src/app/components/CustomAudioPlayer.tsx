@@ -5,7 +5,12 @@ import {
   faForward,
   faPlay,
   faPause,
+  faVolumeUp,
+  faVolumeMute,
 } from "@fortawesome/free-solid-svg-icons";
+
+import { formatTime } from "../utils/formatUtils";
+import useKeyboardEvent from "../hooks/useKeyboardEvent";
 
 interface CustomAudioPlayerProps {
   audioUrl: string | null;
@@ -24,6 +29,7 @@ export default function CustomAudioPlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
@@ -36,12 +42,17 @@ export default function CustomAudioPlayer({
     }
   };
 
+  const toggleMute = () => {
+    if (!audioRef.current) return;
+    audioRef.current.muted = !isMuted;
+    setIsMuted((prev) => !prev);
+  };
+
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.src = audioUrl || "";
       audioRef.current.load();
       setCurrentTime(0);
-      // Optionally, if you want to autoplay when switching tracks:
       if (isPlaying) {
         audioRef.current
           .play()
@@ -49,12 +60,6 @@ export default function CustomAudioPlayer({
       }
     }
   }, [audioUrl]);
-
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!audioRef.current) return;
@@ -68,6 +73,9 @@ export default function CustomAudioPlayer({
       onNext();
     }
   };
+
+  useKeyboardEvent(" ", togglePlay);
+  useKeyboardEvent("m", toggleMute);
 
   if (!audioUrl) {
     return <div className="text-gray-400">Select an audio file to play</div>;
@@ -85,7 +93,7 @@ export default function CustomAudioPlayer({
         }}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
-        onEnded={handleTrackEnded} // Handle when the track ends
+        onEnded={handleTrackEnded}
         className="hidden"
       />
 
@@ -122,6 +130,12 @@ export default function CustomAudioPlayer({
           onChange={handleSeek}
           className="w-full accent-[#64748B]"
         />
+        <button onClick={toggleMute} className="text-white hover:text-gray-300">
+          <FontAwesomeIcon
+            icon={isMuted ? faVolumeMute : faVolumeUp}
+            size="lg"
+          />
+        </button>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AudioList from "./AudioList";
 import CustomAudioPlayer from "./CustomAudioPlayer";
+import Search from "./Search";
 
 interface AudioFile {
   title: string;
@@ -15,10 +16,20 @@ const AudioContainer: React.FC<AudioContainerProps> = ({ audioFiles }) => {
   const [shuffledFiles, setShuffledFiles] = useState<AudioFile[]>([]);
   const [isShuffled, setIsShuffled] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [filteredFiles, setFilteredFiles] = useState<AudioFile[]>(audioFiles);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentTrack, setCurrentTrack] = useState<AudioFile | null>(
+    audioFiles[0]
+  );
 
   useEffect(() => {
     const shuffled = [...audioFiles].sort(() => 0.5 - Math.random());
     setShuffledFiles(shuffled);
+  }, [audioFiles]);
+
+  useEffect(() => {
+    setFilteredFiles(audioFiles);
+    setCurrentTrack(audioFiles[0]);
   }, [audioFiles]);
 
   const handleShuffle = () => {
@@ -27,22 +38,36 @@ const AudioContainer: React.FC<AudioContainerProps> = ({ audioFiles }) => {
   };
 
   const handleNext = () => {
-    const list = isShuffled ? shuffledFiles : audioFiles;
+    const list = isShuffled ? shuffledFiles : filteredFiles;
     setCurrentIndex((prevIndex) => (prevIndex + 1) % list.length);
+    setCurrentTrack(list[(currentIndex + 1) % list.length]);
   };
 
   const handlePrevious = () => {
-    const list = isShuffled ? shuffledFiles : audioFiles;
+    const list = isShuffled ? shuffledFiles : filteredFiles;
     setCurrentIndex((prevIndex) => (prevIndex - 1 + list.length) % list.length);
+    setCurrentTrack(list[(currentIndex - 1 + list.length) % list.length]);
   };
 
-  const listToUse = isShuffled ? shuffledFiles : audioFiles;
-  const currentTrack = listToUse[currentIndex];
+  const listToUse = isShuffled ? shuffledFiles : filteredFiles;
 
   const handleSelectAudio = (url: string) => {
-    const indexInList = listToUse.findIndex((f) => f.url === url);
-    if (indexInList >= 0) {
-      setCurrentIndex(indexInList);
+    const selectedTrack = listToUse.find((f) => f.url === url);
+    if (selectedTrack) {
+      setCurrentTrack(selectedTrack);
+      setCurrentIndex(listToUse.indexOf(selectedTrack));
+    }
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (query.trim() === "") {
+      setFilteredFiles(audioFiles);
+    } else {
+      const filtered = audioFiles.filter((file) =>
+        file.title.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredFiles(filtered);
     }
   };
 
@@ -58,8 +83,10 @@ const AudioContainer: React.FC<AudioContainerProps> = ({ audioFiles }) => {
         </button>
       </div>
 
+      <Search onSearch={handleSearch} />
+
       <AudioList
-        audioFiles={audioFiles}
+        audioFiles={listToUse}
         currentAudioUrl={currentTrack?.url || null}
         onSelectAudio={handleSelectAudio}
       />

@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { formatFilename } from "./formatFileName";
+import { formatFilename } from "./formatUtils";
 
 export interface AudioFile {
   title: string;

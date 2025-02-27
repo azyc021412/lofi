@@ -1,8 +1,5 @@
-"use client";
-
 import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import useKeyboardEvent from "../hooks/useKeyboardEvent";
 
 interface AudioFile {
   title: string;
@@ -20,29 +17,20 @@ const AudioList: React.FC<AudioListProps> = ({
   onSelectAudio,
   currentAudioUrl,
 }) => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [containerHeight, setContainerHeight] = useState("h-20");
 
-  const filteredAudioFiles = audioFiles.filter((file) =>
-    file.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useKeyboardEvent("x", () => {
+    setContainerHeight((prevHeight) =>
+      prevHeight === "h-20" ? "h-100" : "h-20"
+    );
+  });
 
   return (
-    <div className="h-100 overflow-y-auto rounded-md p-1">
-      <div className="relative">
-        <input
-          type="text"
-          placeholder="Search audio..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full p-2 rounded-md bg-[#7A9ACE] text-white focus:outline-none"
-        />
-        <FontAwesomeIcon
-          icon={faSearch}
-          className="absolute right-3 top-3 text-white"
-        />
-      </div>
+    <div
+      className={`${containerHeight} overflow-y-auto rounded-md p-1 transition-all duration-300`}
+    >
       <ul className="list-none mt-3">
-        {filteredAudioFiles.map((file, index) => {
+        {audioFiles.map((file, index) => {
           const isActive = file.url === currentAudioUrl;
           return (
             <li
