@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import AudioList from "./AudioList";
 import CustomAudioPlayer from "./CustomAudioPlayer";

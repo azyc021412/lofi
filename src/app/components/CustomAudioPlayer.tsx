@@ -63,6 +63,12 @@ export default function CustomAudioPlayer({
     setCurrentTime(newTime);
   };
 
+  const handleTrackEnded = () => {
+    if (audioRef.current) {
+      onNext();
+    }
+  };
+
   if (!audioUrl) {
     return <div className="text-gray-400">Select an audio file to play</div>;
   }
@@ -79,6 +85,7 @@ export default function CustomAudioPlayer({
         }}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
+        onEnded={handleTrackEnded} // Handle when the track ends
         className="hidden"
       />
 
