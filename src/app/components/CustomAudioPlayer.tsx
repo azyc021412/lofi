@@ -29,41 +29,19 @@ export default function CustomAudioPlayer({
     if (!audioRef.current) return;
     if (isPlaying) {
       audioRef.current.pause();
-      setIsPlaying(false);
     } else {
       audioRef.current
         .play()
         .catch((err) => console.error("Playback error:", err));
-      setIsPlaying(true);
     }
   };
-
-  useEffect(() => {
-    const audioElement = audioRef.current;
-    if (!audioElement) return;
-
-    const handleTimeUpdate = () => setCurrentTime(audioElement.currentTime);
-    const handleLoadedMetadata = () => setDuration(audioElement.duration);
-    const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
-
-    audioElement.addEventListener("timeupdate", handleTimeUpdate);
-    audioElement.addEventListener("loadedmetadata", handleLoadedMetadata);
-    audioElement.addEventListener("play", handlePlay);
-    audioElement.addEventListener("pause", handlePause);
-
-    return () => {
-      audioElement.removeEventListener("timeupdate", handleTimeUpdate);
-      audioElement.removeEventListener("loadedmetadata", handleLoadedMetadata);
-      audioElement.removeEventListener("play", handlePlay);
-      audioElement.removeEventListener("pause", handlePause);
-    };
-  }, []);
 
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.src = audioUrl || "";
       audioRef.current.load();
+      setCurrentTime(0);
+      // Optionally, if you want to autoplay when switching tracks:
       if (isPlaying) {
         audioRef.current
           .play()
@@ -71,15 +49,6 @@ export default function CustomAudioPlayer({
       }
     }
   }, [audioUrl]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (audioRef.current && isPlaying) {
-        setCurrentTime(audioRef.current.currentTime);
-      }
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [isPlaying]);
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
@@ -100,7 +69,18 @@ export default function CustomAudioPlayer({
 
   return (
     <div className="flex flex-col items-center p-4 bg-[#7A9ACE] rounded-md space-y-4">
-      <audio ref={audioRef} autoPlay className="hidden" />
+      <audio
+        ref={audioRef}
+        autoPlay
+        onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+        onLoadedMetadata={(e) => {
+          setDuration(e.currentTarget.duration);
+          setCurrentTime(0);
+        }}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        className="hidden"
+      />
 
       <div className="flex items-center justify-between w-full mb-4">
         <button onClick={onPrevious} className="text-white hover:text-gray-300">
