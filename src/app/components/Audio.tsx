@@ -18,21 +18,27 @@ const Audio: React.FC<AudioContainerProps> = ({ audioFiles }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { filteredFiles, handleSearch } = useSearch(audioFiles);
   const { shuffledFiles, isShuffled, setIsShuffled } = useShuffle(audioFiles);
+
   const [currentTrack, setCurrentTrack] = useState<AudioFile | null>(
     audioFiles[0]
   );
 
   useEffect(() => {
-    if (filteredFiles.length > 0) {
-      setCurrentTrack(filteredFiles[currentIndex]);
-    }
-  }, [filteredFiles, currentIndex]);
+    if (filteredFiles.length > 0 && currentTrack) {
+      const currentTrackInFiltered = filteredFiles.find(
+        (track) => track.url === currentTrack.url
+      );
 
+      if (!currentTrackInFiltered) {
+        return;
+      }
+    }
+  }, [filteredFiles, currentTrack]);
   useEffect(() => {
     if (audioFiles.length > 0 && !currentTrack) {
       setCurrentTrack(audioFiles[0]);
     }
-  }, [audioFiles, currentTrack]);
+  }, [audioFiles]);
 
   const handleShuffle = () => {
     setIsShuffled((prev) => !prev);
@@ -64,7 +70,7 @@ const Audio: React.FC<AudioContainerProps> = ({ audioFiles }) => {
   };
 
   if (!audioFiles.length) {
-    return;
+    return <div>No audio files available</div>;
   }
 
   return (
@@ -75,7 +81,7 @@ const Audio: React.FC<AudioContainerProps> = ({ audioFiles }) => {
           onClick={handleShuffle}
           className="text-sm px-3 py-1 bg-[#7A9ACE] text-[#E2E8F0] rounded-md"
         >
-          Shuffle: {isShuffled ? "On" : "Off"}
+          <div className="font-bold">Shuffle: {isShuffled ? "On" : "Off"}</div>
         </button>
       </div>
 

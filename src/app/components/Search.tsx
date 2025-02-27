@@ -19,10 +19,10 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
     <div className="relative">
       <input
         type="text"
-        placeholder="Let me check in the back..."
+        placeholder="Look for it..."
         value={searchQuery}
         onChange={handleSearchChange}
-        className="w-full p-2 rounded-md bg-[#7A9ACE] text-white focus:outline-none"
+        className="w-full p-2 rounded-md bg-[#7A9ACE] font-semibold text-white focus:outline-none"
       />
       <FontAwesomeIcon
         icon={faSearch}

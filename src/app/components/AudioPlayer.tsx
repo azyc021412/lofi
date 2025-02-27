@@ -10,7 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useAudioPlayer } from "../hooks/useAudioPlayer";
 import { formatTime } from "../utils/formatUtils";
-import useKeyboardEvent from "../hooks/useKeyboardEvent"; // Import the hook
+import useKeyboardEvent from "../hooks/useKeyboardEvent";
 
 interface AudioPlayerProps {
   audioUrl: string | null;
@@ -38,9 +38,8 @@ export default function AudioPlayer({
     handleLoadedMetadata,
   } = useAudioPlayer(audioUrl);
 
-  // Using the useKeyboardEvent hook for Space and M keys
-  useKeyboardEvent(" ", togglePlay); // Space key to play/pause
-  useKeyboardEvent("m", toggleMute); // M key to mute/unmute
+  useKeyboardEvent(" ", togglePlay);
+  useKeyboardEvent("m", toggleMute);
 
   if (!audioUrl) {
     return <div className="text-gray-400">Select an audio file to play</div>;
@@ -51,8 +50,8 @@ export default function AudioPlayer({
       <audio
         ref={audioRef}
         autoPlay
-        onTimeUpdate={handleTimeUpdate} // Update currentTime on time update
-        onLoadedMetadata={handleLoadedMetadata} // Set duration when metadata is loaded
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
         onPlay={() => {}}
         onPause={() => {}}
         onEnded={onNext}

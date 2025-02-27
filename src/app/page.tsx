@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import Audio from "@/app/components/Audio";
 import useKeyboardEvent from "./hooks/useKeyboardEvent";
+import { AudioFile } from "./utils/getAudioFiles";
 
 const lofiBackgroundUrl = "/assets/images/lofi.jpg";
 
 const Home = () => {
-  const [audios, setAudios] = useState([]);
+  const [audios, setAudios] = useState<AudioFile[]>([]);
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
@@ -16,7 +17,16 @@ const Home = () => {
         const res = await fetch("/api/audio");
         if (!res.ok) throw new Error("Failed to fetch audio files");
         const data = await res.json();
-        setAudios(data);
+
+        const sortedData = data.sort(
+          (a: { title: string }, b: { title: string }) => {
+            if (a.title.toLowerCase() < b.title.toLowerCase()) return -1;
+            if (a.title.toLowerCase() > b.title.toLowerCase()) return 1;
+            return 0;
+          }
+        );
+
+        setAudios(sortedData);
       } catch (error) {
         console.error(error);
       }

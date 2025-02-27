@@ -1,4 +1,3 @@
-// hooks/useAudioPlayer.ts
 import { useState, useRef, useEffect } from "react";
 
 export const useAudioPlayer = (audioUrl: string | null) => {
@@ -8,7 +7,6 @@ export const useAudioPlayer = (audioUrl: string | null) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  // Handle play/pause toggle
   const togglePlay = () => {
     if (!audioRef.current) return;
     if (isPlaying) {
@@ -18,42 +16,38 @@ export const useAudioPlayer = (audioUrl: string | null) => {
         .play()
         .catch((err) => console.error("Playback error:", err));
     }
-    setIsPlaying(!isPlaying); // Toggle the play/pause state
+    setIsPlaying(!isPlaying);
   };
 
-  // Handle mute toggle
   const toggleMute = () => {
     if (!audioRef.current) return;
     audioRef.current.muted = !isMuted;
     setIsMuted(!isMuted);
   };
 
-  // Handle seeking
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!audioRef.current) return;
     const newTime = parseFloat(e.target.value);
     audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime); // Update currentTime manually
+    setCurrentTime(newTime);
   };
 
   useEffect(() => {
     if (audioRef.current && audioUrl) {
       audioRef.current.src = audioUrl;
-      setCurrentTime(0); // Reset currentTime when the audio URL changes
+      setCurrentTime(0);
     }
   }, [audioUrl]);
 
-  // Update currentTime during playback
   const handleTimeUpdate = () => {
     if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime); // Update currentTime on time update
+      setCurrentTime(audioRef.current.currentTime);
     }
   };
 
-  // Set duration when metadata is loaded
   const handleLoadedMetadata = () => {
     if (audioRef.current) {
-      setDuration(audioRef.current.duration); // Set duration on metadata load
+      setDuration(audioRef.current.duration);
     }
   };
 
