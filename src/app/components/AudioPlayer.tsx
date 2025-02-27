@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBackward,
@@ -8,74 +8,39 @@ import {
   faVolumeUp,
   faVolumeMute,
 } from "@fortawesome/free-solid-svg-icons";
-
+import { useAudioPlayer } from "../hooks/useAudioPlayer";
 import { formatTime } from "../utils/formatUtils";
-import useKeyboardEvent from "../hooks/useKeyboardEvent";
+import useKeyboardEvent from "../hooks/useKeyboardEvent"; // Import the hook
 
-interface CustomAudioPlayerProps {
+interface AudioPlayerProps {
   audioUrl: string | null;
   title: string;
   onNext: () => void;
   onPrevious: () => void;
 }
 
-export default function CustomAudioPlayer({
+export default function AudioPlayer({
   audioUrl,
   title,
   onNext,
   onPrevious,
-}: CustomAudioPlayerProps) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [isMuted, setIsMuted] = useState(false);
+}: AudioPlayerProps) {
+  const {
+    audioRef,
+    isPlaying,
+    isMuted,
+    togglePlay,
+    toggleMute,
+    handleSeek,
+    currentTime,
+    duration,
+    handleTimeUpdate,
+    handleLoadedMetadata,
+  } = useAudioPlayer(audioUrl);
 
-  const togglePlay = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current
-        .play()
-        .catch((err) => console.error("Playback error:", err));
-    }
-  };
-
-  const toggleMute = () => {
-    if (!audioRef.current) return;
-    audioRef.current.muted = !isMuted;
-    setIsMuted((prev) => !prev);
-  };
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.src = audioUrl || "";
-      audioRef.current.load();
-      setCurrentTime(0);
-      if (isPlaying) {
-        audioRef.current
-          .play()
-          .catch((err) => console.error("Autoplay error:", err));
-      }
-    }
-  }, [audioUrl]);
-
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!audioRef.current) return;
-    const newTime = parseFloat(e.target.value);
-    audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
-  };
-
-  const handleTrackEnded = () => {
-    if (audioRef.current) {
-      onNext();
-    }
-  };
-
-  useKeyboardEvent(" ", togglePlay);
-  useKeyboardEvent("m", toggleMute);
+  // Using the useKeyboardEvent hook for Space and M keys
+  useKeyboardEvent(" ", togglePlay); // Space key to play/pause
+  useKeyboardEvent("m", toggleMute); // M key to mute/unmute
 
   if (!audioUrl) {
     return <div className="text-gray-400">Select an audio file to play</div>;
@@ -86,14 +51,11 @@ export default function CustomAudioPlayer({
       <audio
         ref={audioRef}
         autoPlay
-        onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
-        onLoadedMetadata={(e) => {
-          setDuration(e.currentTarget.duration);
-          setCurrentTime(0);
-        }}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        onEnded={handleTrackEnded}
+        onTimeUpdate={handleTimeUpdate} // Update currentTime on time update
+        onLoadedMetadata={handleLoadedMetadata} // Set duration when metadata is loaded
+        onPlay={() => {}}
+        onPause={() => {}}
+        onEnded={onNext}
         className="hidden"
       />
 

@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import AudioContainer from "@/app/components/AudioContainer";
+import Audio from "@/app/components/Audio";
 import useKeyboardEvent from "./hooks/useKeyboardEvent";
 
 const lofiBackgroundUrl = "/assets/images/lofi.jpg";
 
 const Home = () => {
   const [audios, setAudios] = useState([]);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     const fetchAudios = async () => {
@@ -43,7 +43,7 @@ const Home = () => {
           isVisible ? "" : "hidden"
         }`}
       >
-        <AudioContainer audioFiles={audios} />
+        <Audio audioFiles={audios} />
       </div>
     </main>
   );

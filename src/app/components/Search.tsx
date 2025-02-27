@@ -19,7 +19,7 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
     <div className="relative">
       <input
         type="text"
-        placeholder="Search audio..."
+        placeholder="Let me check in the back..."
         value={searchQuery}
         onChange={handleSearchChange}
         className="w-full p-2 rounded-md bg-[#7A9ACE] text-white focus:outline-none"
